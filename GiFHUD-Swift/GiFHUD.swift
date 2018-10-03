@@ -288,6 +288,7 @@ public class GIFHUD: UIView {
     layer.cornerRadius = 10
     layer.masksToBounds = true
 
+    NotificationCenter.default.addObserver(self, selector: #selector(self.rotated), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
     imageView = GIFHUDImageView(frame: bounds.insetBy(dx: 20, dy: 20))
     addSubview(imageView!)
   }
@@ -301,6 +302,7 @@ public class GIFHUD: UIView {
   public func show(withOverlay: Bool = false, duration: Double? = nil) {
     dismiss(completion: { [unowned self] in
 
+    NotificationCenter.default.addObserver(self, selector: #selector(self.rotated), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
       // Add overlay if needed.
       if withOverlay {
         self.createOverlayView()
@@ -328,7 +330,7 @@ public class GIFHUD: UIView {
       self.fadeIn(completion: {
         self.isShowing = true
       })
-
+        
       // Dismiss if duration set.
       if let duration = duration {
         let time = DispatchTime.now() + Double(Int64(duration * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
@@ -344,6 +346,7 @@ public class GIFHUD: UIView {
       completion?()
       return
     }
+    NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
 
     // Remove overlay if needed
     overlayView?.removeFromSuperview()
@@ -362,6 +365,13 @@ public class GIFHUD: UIView {
     })
   }
 
+    
+    @objc func rotated() {
+        if let point = window?.center {
+            center = point
+        }
+    }
+    
   // MARK: Effects
 
   private func fadeIn(completion: (() -> Void)? = nil) {
@@ -430,4 +440,5 @@ public class GIFHUD: UIView {
     imageView?.animationImages = images
     imageView?.animationDuration = TimeInterval(gifSpeed)
   }
+    
 }
