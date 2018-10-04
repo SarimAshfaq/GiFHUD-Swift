@@ -169,7 +169,7 @@ public class GIFHUDImage: UIImage {
   // MARK: Display Link Helpers
 
   public func attachDisplayLink() {
-    displayLink.add(to: RunLoop.main, forMode: RunLoopMode.commonModes)
+    displayLink.add(to: RunLoop.main, forMode: RunLoop.Mode.common)
   }
 
   // MARK: Frame Methods
@@ -188,7 +188,7 @@ public class GIFHUDImage: UIImage {
 
       if index < framesToPreload {
         let frameImageRef = CGImageSourceCreateImageAtIndex(self.imageSource!, Int(index), nil)
-        let frame = UIImage(cgImage: frameImageRef!, scale: 0.0, orientation: UIImageOrientation.up)
+        let frame = UIImage(cgImage: frameImageRef!, scale: 0.0, orientation: UIImage.Orientation.up)
         frames.append(frame)
       } else {
         frames.append(nil)
@@ -287,8 +287,7 @@ public class GIFHUD: UIView {
     layer.backgroundColor = UIColor(white: 0, alpha: 0.5).cgColor
     layer.cornerRadius = 10
     layer.masksToBounds = true
-
-    NotificationCenter.default.addObserver(self, selector: #selector(self.rotated), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
+    
     imageView = GIFHUDImageView(frame: bounds.insetBy(dx: 20, dy: 20))
     addSubview(imageView!)
   }
@@ -302,7 +301,7 @@ public class GIFHUD: UIView {
   public func show(withOverlay: Bool = false, duration: Double? = nil) {
     dismiss(completion: { [unowned self] in
 
-    NotificationCenter.default.addObserver(self, selector: #selector(self.rotated), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.rotated), name: UIDevice.orientationDidChangeNotification, object: nil)
       // Add overlay if needed.
       if withOverlay {
         self.createOverlayView()
@@ -317,7 +316,7 @@ public class GIFHUD: UIView {
       }
 
       // Bring it front
-      self.window?.bringSubview(toFront: self)
+        self.window?.bringSubviewToFront(self)
 
       // Start animation
       if let _ = self.imageView?.animationImages {
@@ -346,7 +345,7 @@ public class GIFHUD: UIView {
       completion?()
       return
     }
-    NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
+    NotificationCenter.default.removeObserver(self, name: UIDevice.orientationDidChangeNotification, object: nil)
 
     // Remove overlay if needed
     overlayView?.removeFromSuperview()
